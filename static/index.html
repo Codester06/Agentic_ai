@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Construction Planning Assistant</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231c1b19'/><path d='M20 80 L20 45 L50 20 L80 45 L80 80' stroke='%23d4956a' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M38 80 L38 60 L62 60 L62 80' stroke='%23d4956a' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <!-- ICON SIDEBAR -->
+    <div class="icon-sidebar">
+      <button class="isb" onclick="toggleSidebar()" title="History">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <button class="isb" onclick="startNewPlan()" title="New plan">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
+      <div class="spacer"></div>
+      <div class="avatar">A</div>
+    </div>
+
+    <!-- FULL SIDEBAR (history) -->
+    <div class="full-sidebar" id="full-sidebar">
+      <div class="fs-top">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span class="fs-title">Arch</span>
+          <span
+            style="
+              font-size: 0.7rem;
+              color: var(--muted);
+              letter-spacing: 0.5px;
+            "
+            >Construction AI</span
+          >
+        </div>
+        <button class="fs-close" onclick="toggleSidebar()">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <button class="new-plan-btn" onclick="startNewPlan()">
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        New plan
+      </button>
+      <div class="fs-section">Recents</div>
+      <div class="history-list" id="history-list">
+        <div class="history-empty">No plans yet.</div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- HOME -->
+      <div id="home">
+        <div class="title-wrap" id="title-wrap"></div>
+        <div class="input-card">
+          <textarea
+            id="goal-input"
+            placeholder="Describe your construction project..."
+            rows="2"
+          ></textarea>
+          <div class="input-footer">
+            <div class="model-badge">
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
+                />
+              </svg>
+              Llama 8B · Groq
+            </div>
+            <button class="send-btn" id="send-btn" onclick="generatePlan()">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="19" x2="12" y2="5" />
+                <polyline points="5 12 12 5 19 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="pills">
+          <div
+            class="pill active"
+            data-tool="materials"
+            onclick="togglePill(this)"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+              />
+            </svg>
+            Materials
+          </div>
+          <div class="pill active" data-tool="labor" onclick="togglePill(this)">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+            </svg>
+            Labor
+          </div>
+          <div
+            class="pill active"
+            data-tool="permits"
+            onclick="togglePill(this)"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Permits
+          </div>
+          <div
+            class="pill active"
+            data-tool="schedule"
+            onclick="togglePill(this)"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Schedule
+          </div>
+          <div class="pill" data-tool="budget" onclick="togglePill(this)">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            Budget
+          </div>
+          <div class="pill" data-tool="risk" onclick="togglePill(this)">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            Risk
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT SCREEN -->
+      <div id="chat-screen">
+        <!-- topbar -->
+        <div class="topbar">
+          <div class="topbar-left">
+            <div class="status-dot" id="status-dot"></div>
+            <span class="topbar-title" id="topbar-title">Planning...</span>
+          </div>
+          <div class="topbar-right">
+            <button class="tb-btn" onclick="startNewPlan()">New plan</button>
+          </div>
+        </div>
+        <div class="progress-track" style="display: none">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <!-- messages + right log panel -->
+        <div class="result-body-wrap">
+          <div class="chat-body" id="chat-body">
+          <div class="chat-inner">
+            <!-- user bubble -->
+            <div class="user-bubble" id="user-goal-text"></div>
+            <!-- thinking indicator + waveform -->
+            <div class="thinking-wrap" id="thinking-wrap" style="display: none">
+              <div class="thinking" id="thinking">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="waveform-wrap">
+                <canvas
+                  class="waveform-canvas"
+                  id="waveform-canvas"
+                  width="1040"
+                  height="80"
+                ></canvas>
+              </div>
+            </div>
+            <!-- analysis dropdown -->
+            <div class="analysis-block" id="analysis-block"></div>
+            <!-- agent response -->
+            <div class="agent-response">
+
+              <!-- METRICS -->
+              <div class="metrics-row" id="metrics-row" style="display:none">
+                <div class="metric-card">
+                  <div class="metric-label">Phases</div>
+                  <div class="metric-value" id="m-phases">—</div>
+                  <div class="metric-sub">construction phases</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">Duration</div>
+                  <div class="metric-value" id="m-days">—</div>
+                  <div class="metric-sub">total calendar days</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">Tool Calls</div>
+                  <div class="metric-value" id="m-calls">—</div>
+                  <div class="metric-sub">agent actions taken</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-label">Readiness</div>
+                  <div class="metric-value" id="m-status" style="font-size:16px;margin-top:6px">—</div>
+                  <div class="metric-sub">based on permits & labor</div>
+                </div>
+              </div>
+
+              <!-- TABS -->
+              <div id="plan-tabs-wrap" style="display:none">
+                <div class="plan-tabs">
+                  <div class="plan-tab active" onclick="switchPlanTab('overview')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Overview
+                  </div>
+                  <div class="plan-tab" onclick="switchPlanTab('phases')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    Phases
+                  </div>
+                  <div class="plan-tab" onclick="switchPlanTab('schedule')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                    Schedule
+                  </div>
+                  <div class="plan-tab" onclick="switchPlanTab('log')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                    Agent Log
+                  </div>
+                </div>
+
+                <div class="tab-panel active" id="tab-overview">
+                  <div id="plan-content"></div>
+                </div>
+
+                <div class="tab-panel" id="tab-phases">
+                  <div class="section-head">Phase Breakdown</div>
+                  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+                    <table class="phase-table">
+                      <thead><tr>
+                        <th style="width:36px">#</th>
+                        <th>Phase</th><th>Start</th><th>End</th><th>Duration</th>
+                        <th>Material</th><th>Labor</th><th>Permit</th>
+                      </tr></thead>
+                      <tbody id="phase-table-body"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="tab-panel" id="tab-schedule">
+                  <div class="section-head">Gantt Chart</div>
+                  <div class="gantt-wrap">
+                    <div class="gantt-header" id="gantt-header"></div>
+                    <div id="gantt-rows"></div>
+                  </div>
+                </div>
+
+                <div class="tab-panel" id="tab-log">
+                  <div class="section-head">Agent Execution Log</div>
+                  <div class="agent-log" id="agent-log-content"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+          <!-- RIGHT LOG PANEL -->
+          <div class="right-log-panel" id="right-log-panel">
+            <div class="right-log-header">
+              <span id="sidebar-log-dot" class="rlog-dot"></span>
+              <span class="rlog-title">Agent Log</span>
+            </div>
+            <div class="sidebar-log" id="sidebar-log">
+              <div class="sidebar-log-empty">Run a plan to see logs.</div>
+            </div>
+          </div>
+
+        </div><!-- end result-body-wrap -->
+
+        <!-- reply bar -->
+        <div class="reply-bar" id="reply-bar">
+          <div class="reply-card">
+            <textarea
+              id="reply-input"
+              placeholder="Reply..."
+              rows="1"
+            ></textarea>
+            <div class="reply-footer">
+              <div class="model-badge">
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
+                  />
+                </svg>
+                Llama 8B · Groq
+              </div>
+              <button
+                class="send-btn"
+                id="reply-send-btn"
+                onclick="generatePlan()"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="12" y1="19" x2="12" y2="5" />
+                  <polyline points="5 12 12 5 19 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="reply-hint">
+            Arch can make mistakes. Verify critical data.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+
+  </body>
+</html>
