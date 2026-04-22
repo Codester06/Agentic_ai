@@ -173,6 +173,11 @@ function startNewPlan(){
   if(document.getElementById('phase-table-body')) document.getElementById('phase-table-body').innerHTML='';
   if(document.getElementById('gantt-rows')) document.getElementById('gantt-rows').innerHTML='';
   if(document.getElementById('agent-log-content')) document.getElementById('agent-log-content').innerHTML='';
+  document.getElementById('m-budget-card').style.display='none';
+  document.getElementById('m-risk-card').style.display='none';
+  document.getElementById('tab-insights-btn').style.display='none';
+  document.getElementById('insights-budget').style.display='none';
+  document.getElementById('insights-risk').style.display='none';
   switchPlanTab('overview');
   document.getElementById('chat-body').scrollTop=0;
 }
@@ -283,6 +288,53 @@ function populateDashboard(item, toolCallCount) {
   const approved = permits.filter(p => p.includes('approved')).length;
   document.getElementById('m-status').textContent = phaseEntries.length
     ? Math.round((approved / phaseEntries.length) * 100) + '%' : '—';
+
+  // Budget card — extract from plan markdown
+  const planText = item.plan_markdown || item.plan || '';
+  const budgetMatch = planText.match(/##\s*Budget[^\n]*\n([\s\S]*?)(?=\n##|$)/i);
+  const riskMatch   = planText.match(/##\s*Risk[^\n]*\n([\s\S]*?)(?=\n##|$)/i);
+  const toolsEnabled = item.project?.tools_enabled || item.project?.tools_used || [];
+
+  const hasBudget = toolsEnabled.includes('budget') || !!budgetMatch;
+  const hasRisk   = toolsEnabled.includes('risk')   || !!riskMatch;
+
+  // Budget card
+  document.getElementById('m-budget-card').style.display = hasBudget ? '' : 'none';
+  if(hasBudget) {
+    const budgetLine = budgetMatch ? budgetMatch[1].trim().split('\n')[0] : '';
+    const costMatch = budgetLine.match(/[\$₹€£][\d,]+|[\d,]+\s*(USD|INR|EUR)/i);
+    document.getElementById('m-budget').textContent = costMatch ? costMatch[0] : 'See plan';
+  }
+
+  // Risk card
+  document.getElementById('m-risk-card').style.display = hasRisk ? '' : 'none';
+  if(hasRisk) {
+    const labors = phaseEntries.filter(p=>(p.labor||'').toLowerCase().includes('shortage')).length;
+    const pending = phaseEntries.filter(p=>!(p.permit||'').toLowerCase().includes('approved')).length;
+    const riskScore = labors + pending;
+    const riskLabel = riskScore === 0 ? 'LOW' : riskScore <= 2 ? 'MEDIUM' : 'HIGH';
+    const riskColor = riskScore === 0 ? 'var(--teal)' : riskScore <= 2 ? 'var(--amber2)' : 'var(--coral)';
+    const el = document.getElementById('m-risk');
+    el.textContent = riskLabel;
+    el.style.color = riskColor;
+  }
+
+  // Insights tab
+  const insightsBtn = document.getElementById('tab-insights-btn');
+  insightsBtn.style.display = (hasBudget || hasRisk) ? '' : 'none';
+
+  if(hasBudget) {
+    document.getElementById('insights-budget').style.display = '';
+    document.getElementById('budget-content').innerHTML = budgetMatch
+      ? budgetMatch[1].trim().replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      : '<p style="color:var(--muted)">Budget section included in the Overview tab.</p>';
+  }
+  if(hasRisk) {
+    document.getElementById('insights-risk').style.display = '';
+    document.getElementById('risk-content').innerHTML = riskMatch
+      ? riskMatch[1].trim().replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      : '<p style="color:var(--muted)">Risk section included in the Overview tab.</p>';
+  }
 
   // Phase table
   const tbody = document.getElementById('phase-table-body');

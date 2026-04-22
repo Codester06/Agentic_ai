@@ -336,6 +336,18 @@
                   <div class="metric-value" id="m-status" style="font-size:16px;margin-top:6px">—</div>
                   <div class="metric-sub">based on permits & labor</div>
                 </div>
+                <!-- Budget card — shown only when budget pill active -->
+                <div class="metric-card" id="m-budget-card" style="display:none">
+                  <div class="metric-label">Est. Budget</div>
+                  <div class="metric-value" id="m-budget" style="font-size:18px;margin-top:4px">—</div>
+                  <div class="metric-sub">from plan estimate</div>
+                </div>
+                <!-- Risk card — shown only when risk pill active -->
+                <div class="metric-card" id="m-risk-card" style="display:none">
+                  <div class="metric-label">Risk Level</div>
+                  <div class="metric-value" id="m-risk" style="font-size:18px;margin-top:4px">—</div>
+                  <div class="metric-sub">based on shortages & permits</div>
+                </div>
               </div>
 
               <!-- TABS -->
@@ -356,6 +368,10 @@
                   <div class="plan-tab" onclick="switchPlanTab('log')">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
                     Agent Log
+                  </div>
+                  <div class="plan-tab" id="tab-insights-btn" style="display:none" onclick="switchPlanTab('insights')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Insights
                   </div>
                 </div>
 
@@ -388,6 +404,17 @@
                 <div class="tab-panel" id="tab-log">
                   <div class="section-head">Agent Execution Log</div>
                   <div class="agent-log" id="agent-log-content"></div>
+                </div>
+
+                <div class="tab-panel" id="tab-insights">
+                  <div id="insights-budget" style="display:none">
+                    <div class="section-head">Budget Estimate</div>
+                    <div id="budget-content" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;font-size:13px;line-height:1.8;color:var(--text)"></div>
+                  </div>
+                  <div id="insights-risk" style="display:none;margin-top:20px">
+                    <div class="section-head">Risk Summary</div>
+                    <div id="risk-content" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;font-size:13px;line-height:1.8;color:var(--text)"></div>
+                  </div>
                 </div>
               </div>
 
